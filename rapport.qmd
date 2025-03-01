@@ -1,0 +1,103 @@
+---
+
+---
+title: "Analyse des données des élus"
+author: "Thomas Papeix"
+format: html
+params:
+  code_commune: "75056"
+  code_departement: "75"
+---
+
+## Introduction
+
+Ce rapport analyse les données des élus en fonction de leur commune et de leur département.\
+Nous allons explorer la répartition des élus par catégorie socio-professionnelle et la distribution des âges.
+
+------------------------------------------------------------------------
+
+---
+
+```{r setup, include=FALSE}
+# Charger les packages
+library(firstlibpeix)
+library(ggplot2)
+library(dplyr)
+library(readr)
+
+# Vérifier si les paramètres existent, sinon les définir par défaut
+if (!exists("params")) {
+  params <- list(code_commune = "75056", code_departement = "75")
+}
+
+# Définir les paramètres
+code_commune <- params$code_commune
+code_departement <- params$code_departement
+
+# Charger les données (Assure-toi que "elus_sample.csv" est bien dans ton projet)
+elus_sample <- read_delim("elus_sample.csv", delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+# Vérifier la structure des données
+head(elus_sample)
+
+
+
+
+```
+
+## **Ajouter l’analyse d’un de commune et departement** 
+
+```{r summary_commune}
+## Résumé de la commune sélectionnée
+
+# Vérifier que la colonne existe
+if ("Code de la commune" %in% colnames(elus_sample)) {
+
+  # Convertir la colonne et le paramètre en `character`
+  elus_sample$`Code de la commune` <- as.character(elus_sample$`Code de la commune`)
+  code_commune <- as.character(code_commune)
+
+  # Filtrer la commune
+  data_commune <- elus_sample[elus_sample$`Code de la commune` == code_commune, ]
+
+  # Vérifier que la commune existe
+  if (nrow(data_commune) > 0) {
+    data_commune <- creer_commune(data_commune)
+    summary_commune(data_commune)
+  } else {
+    print("Aucune donnée pour la commune sélectionnée.")
+  }
+
+} else {
+  stop("Erreur : La colonne 'Code de la commune' est absente du dataset.")
+}
+
+
+```
+
+```{r summary_departement}
+## Résumé du département sélectionné
+
+# Vérifier que la colonne existe
+if ("Code du département" %in% colnames(elus_sample)) {
+
+  # Convertir la colonne et le paramètre en `character`
+  elus_sample$`Code du département` <- as.character(elus_sample$`Code du département`)
+  code_departement <- as.character(code_departement)
+
+  # Filtrer le département
+  data_departement <- elus_sample[elus_sample$`Code du département` == code_departement, ]
+
+  # Vérifier que le département existe
+  if (nrow(data_departement) > 0) {
+    data_departement <- creer_departement(data_departement)
+    summary_departement(data_departement)
+  } else {
+    print("Aucune donnée pour le département sélectionné.")
+  }
+
+} else {
+  stop("Erreur : La colonne 'Code du département' est absente du dataset.")
+}
+
+```
